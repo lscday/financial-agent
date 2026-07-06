@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>金融资管 AI 智能中台</title>
+<style>
+  :root {
+    --primary: #1a73e8;
+    --primary-dark: #1557b0;
+    --bg: #f0f2f5;
+    --card: #ffffff;
+    --text: #1f1f1f;
+    --text-secondary: #666;
+    --border: #e0e0e0;
+    --success: #0f9d58;
+    --warning: #f4b400;
+    --danger: #d93025;
+    --radius: 12px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, #1a73e8, #0d47a1);
+    color: #fff;
+    padding: 20px 32px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .header h1 { font-size: 22px; font-weight: 600; }
+  .header p { font-size: 13px; opacity: 0.85; margin-top: 4px; }
+
+  /* Layout */
+  .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+  /* Cards */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 14px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-body { padding: 16px 20px; }
+  .card-footer {
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+    background: #fafafa;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  /* Full width card */
+  .full-width { grid-column: 1 / -1; }
+
+  /* Form */
+  .input-row { display: flex; gap: 10px; margin-bottom: 12px; }
+  .input-row:last-child { margin-bottom: 0; }
+  input, select {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: border 0.2s;
+  }
+  input:focus, select:focus { border-color: var(--primary); }
+
+  /* Buttons */
+  .btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-success { background: var(--success); color: #fff; }
+  .btn-success:hover { background: #0b8043; }
+  .btn-danger { background: var(--danger); color: #fff; }
+  .btn-danger:hover { background: #b3261e; }
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+  /* Output */
+  .output {
+    background: #f8f9fa;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 14px;
+    line-height: 1.7;
+    min-height: 180px;
+    max-height: 400px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: inherit;
+  }
+  .output:empty::before {
+    content: attr(data-placeholder);
+    color: #aaa;
+  }
+  .output .streaming { color: var(--primary); }
+  .output .token {
+    display: inline;
+    animation: fadeIn 0.2s ease-in;
+  }
+  .output .error { color: var(--danger); }
+  .output .meta { font-size: 12px; color: var(--text-secondary); padding: 4px 0; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(2px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Agent result */
+  .agent-summary { margin-bottom: 12px; }
+  .agent-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-right: 6px;
+  }
+  .badge-success { background: #e6f4ea; color: var(--success); }
+  .badge-fail { background: #fce8e6; color: var(--danger); }
+  .badge-info { background: #e8f0fe; color: var(--primary); }
+
+  /* Loading */
+  .spinner {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border: 2px solid #e0e0e0;
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Status bar */
+  .status-bar {
+    display: flex; gap: 20px; flex-wrap: wrap;
+    padding: 12px 0 4px;
+    font-size: 14px;
+    color: #e0e8ff;
+    font-weight: 500;
+  }
+  .status-item { display: flex; align-items: center; gap: 6px; }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    display: inline-block;
+  }
+  .dot-online { background: var(--success); }
+  .dot-offline { background: var(--danger); }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; }
+    .container { padding: 12px; }
+    .header { padding: 16px; }
+  }
+
+  /* Tabs within cards */
+  .tab-bar {
+    display: flex; gap: 4px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+  }
+  .tab-btn {
+    padding: 6px 16px;
+    border: none;
+    background: none;
+    font-size: 13px;
+    cursor: pointer;
+    border-radius: 6px;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+  }
+  .tab-btn.active {
+    background: var(--primary);
+    color: #fff;
+  }
+  .tab-btn:hover:not(.active) { background: #f0f0f0; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🏦 金融资管 AI 智能中台</h1>
+  <p>基于 LangChain4j + LangGraph4j + DeepSeek + Elasticsearch</p>
+  <div class="status-bar">
+    <span class="status-item">
+      <span class="status-dot dot-online"></span> 后端运行中
+    </span>
+    <span class="status-item" id="backendStatus">状态检查中...</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Row 1: Chat + Agent -->
+  <div class="grid">
+
+    <!-- Chat Card -->
+    <div class="card">
+      <div class="card-header">💬 AI 对话</div>
+      <div class="card-body">
+        <div class="input-row">
+          <input type="text" id="chatInput" placeholder="输入您的问题..." onkeydown="if(event.key==='Enter') streamChat()">
+          <button class="btn btn-primary" id="chatBtn" onclick="streamChat()">发送</button>
+          <button class="btn btn-danger btn-sm" onclick="stopStream()" id="stopBtn" style="display:none">停止</button>
+        </div>
+        <div class="output" id="chatOutput" data-placeholder="AI 回答将显示在这里..."></div>
+      </div>
+      <div class="card-footer">
+        测试：<code>"个人养老金每年缴费上限是多少？"</code>
+      </div>
+    </div>
+
+    <!-- Agent Card -->
+    <div class="card">
+      <div class="card-header">🤖 多 Agent 编排</div>
+      <div class="card-body">
+        <div class="tab-bar" id="agentTabBar">
+          <button class="tab-btn active" onclick="switchAgentTab('execute')">执行工作流</button>
+          <button class="tab-btn" onclick="switchAgentTab('rag')">RAG 检索</button>
+        </div>
+
+        <!-- Tab: Execute -->
+        <div class="tab-content active" id="tab-execute">
+          <div class="input-row">
+            <select id="agentQuery">
+              <option value="理财产品清算">💳 理财产品清算（正常流程）</option>
+              <option value="理财产品清算 force_ok">✅ 理财产品清算（强制成功）</option>
+              <option value="大额资金转出500万">⚠️ 大额资金转出（中等风险）</option>
+              <option value="高风险违约交易">🚨 高风险违约交易（高风险）</option>
+              <option value="触发重试测试">🔁 模拟异常（触发重试）</option>
+            </select>
+            <select id="agentBizType">
+              <option value="wealth">财富管理</option>
+              <option value="pension">养老金</option>
+              <option value="general">通用</option>
+            </select>
+          </div>
+          <div class="input-row">
+            <button class="btn btn-success" id="agentBtn" onclick="executeAgent()">🚀 执行工作流</button>
+          </div>
+          <div class="output" id="agentOutput" data-placeholder="Agent 工作流结果将显示在这里..."></div>
+        </div>
+
+        <!-- Tab: RAG -->
+        <div class="tab-content" id="tab-rag">
+          <div class="input-row">
+            <input type="text" id="ragQuery" placeholder="输入检索问题..." value="养老金政策">
+          </div>
+          <div class="input-row">
+            <button class="btn btn-success" id="ragBtn" onclick="executeRAG()">🔍 RAG 检索</button>
+          </div>
+          <div class="output" id="ragOutput" data-placeholder="RAG 检索结果将显示在这里..."></div>
+        </div>
+      </div>
+      <div class="card-footer">
+        选择测试场景体验不同的 Agent 工作流路径
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 2: Agent Results Detail -->
+  <div class="card full-width" style="margin-top:20px">
+    <div class="card-header">📋 工作流执行详情</div>
+    <div class="card-body">
+      <div class="output" id="agentDetail" data-placeholder="展开完整的工作流执行详情..." style="min-height: 100px; max-height: 500px;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const BASE = 'http://localhost:8080';
+let abortController = null;
+
+// === 页面加载检查后端 ===
+window.onload = function() {
+  fetch(BASE + '/api/agent/status')
+    .then(r => r.text())
+    .then(t => document.getElementById('backendStatus').textContent = '✅ ' + t)
+    .catch(() => {
+      document.getElementById('backendStatus').textContent = '❌ 后端未连接';
+      document.getElementById('backendStatus').parentElement.querySelector('.status-dot').className = 'status-dot dot-offline';
+    });
+};
+
+// === 流式聊天 ===
+function streamChat() {
+  const input = document.getElementById('chatInput');
+  const output = document.getElementById('chatOutput');
+  const btn = document.getElementById('chatBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const question = input.value.trim();
+  if (!question) return;
+
+  output.innerHTML = '<span class="streaming">⏳ 思考中...</span>';
+  btn.disabled = true;
+  stopBtn.style.display = 'inline-flex';
+
+  abortController = new AbortController();
+  const es = new EventSource(BASE + '/api/chat/stream?question=' + encodeURIComponent(question));
+
+  output.innerHTML = '';
+  es.onmessage = function(e) {
+    removePlaceholder(output);
+    output.innerHTML += '<span class="token">' + escapeHtml(e.data) + '</span>';
+    output.scrollTop = output.scrollHeight;
+  };
+
+  es.onerror = function() {
+    es.close();
+    btn.disabled = false;
+    stopBtn.style.display = 'none';
+    if (output.innerHTML === '') {
+      output.innerHTML = '<span class="error">⚠️ 请求失败，请检查后端是否可用</span>';
+    }
+  };
+
+  // 关联到停止按钮
+  window._currentES = es;
+}
+
+function stopStream() {
+  if (window._currentES) {
+    window._currentES.close();
+    window._currentES = null;
+  }
+  document.getElementById('chatBtn').disabled = false;
+  document.getElementById('stopBtn').style.display = 'none';
+}
+
+// === Agent 工作流 ===
+function executeAgent() {
+  const query = document.getElementById('agentQuery').value.trim() || 'normal';
+  const bizType = document.getElementById('agentBizType').value;
+  const output = document.getElementById('agentOutput');
+  const detail = document.getElementById('agentDetail');
+  const btn = document.getElementById('agentBtn');
+
+  output.innerHTML = '<span class="streaming"><span class="spinner"></span> 执行 Agent 工作流...</span>';
+  detail.innerHTML = '';
+  btn.disabled = true;
+
+  const url = BASE + '/api/agent/execute?query=' + encodeURIComponent(query) + '&businessType=' + encodeURIComponent(bizType);
+
+  fetch(url, { method: 'POST' })
+    .then(r => r.json())
+    .then(data => {
+      btn.disabled = false;
+      renderAgentResult(data, output, detail);
+    })
+    .catch(err => {
+      btn.disabled = false;
+      output.innerHTML = '<span class="error">⚠️ 请求异常: ' + escapeHtml(err.message) + '</span>';
+    });
+}
+
+function renderAgentResult(data, output, detail) {
+  let html = '';
+
+  // 状态徽章
+  if (data.success) {
+    html += '<span class="agent-badge badge-success">✅ 执行成功</span>';
+  } else {
+    html += '<span class="agent-badge badge-fail">❌ 执行失败</span>';
+  }
+
+  if (data.history && data.history.length) {
+    html += ' <span class="agent-badge badge-info">路径: ' + data.history.join(' → ') + '</span>';
+  }
+
+  html += '<span class="agent-badge badge-info">耗时: ' + data.elapsedMs + 'ms</span>';
+
+  // Risk level badge
+  if (data.finalState && data.finalState.riskLevel) {
+    const rl = data.finalState.riskLevel;
+    const cls = rl === 'HIGH' ? 'badge-fail' : rl === 'MEDIUM' ? 'badge-info' : 'badge-success';
+    html += ' <span class="agent-badge ' + cls + '">风险: ' + rl + '</span>';
+  }
+
+  // Settlement status
+  if (data.finalState) {
+    html += data.finalState.settlementSuccess
+      ? ' <span class="agent-badge badge-success">✅ 清算成功</span>'
+      : ' <span class="agent-badge badge-fail">❌ 清算未执行</span>';
+  }
+
+  // Summary
+  if (data.summary) {
+    html += '<div class="agent-summary" style="margin-top:10px;padding:10px;background:#f0f7ff;border-radius:8px;font-size:13px;">';
+    html += '<strong>📝 摘要：</strong><br>' + escapeHtml(data.summary);
+    html += '</div>';
+  }
+
+  if (data.error) {
+    html += '<div style="margin-top:8px;color:var(--danger);font-size:13px;">错误: ' + escapeHtml(data.error) + '</div>';
+  }
+
+  output.innerHTML = html;
+
+  // Detail
+  if (data.finalState) {
+    let dhtml = '<pre style="font-size:13px;line-height:1.6;margin:0;overflow-x:auto;">';
+    dhtml += JSON.stringify(data.finalState, null, 2);
+    dhtml += '</pre>';
+    detail.innerHTML = dhtml;
+  }
+}
+
+// === RAG 检索 ===
+function executeRAG() {
+  const query = document.getElementById('ragQuery').value.trim();
+  const output = document.getElementById('ragOutput');
+  const detail = document.getElementById('agentDetail');
+  const btn = document.getElementById('ragBtn');
+  if (!query) return;
+
+  output.innerHTML = '<span class="streaming"><span class="spinner"></span> 检索中...</span>';
+  btn.disabled = true;
+
+  fetch(BASE + '/api/rag/query?question=' + encodeURIComponent(query))
+    .then(r => r.json())
+    .then(data => {
+      btn.disabled = false;
+      let html = '';
+
+      if (data.answer) {
+        html += '<div style="margin-bottom:10px;"><strong>回答：</strong></div>';
+        html += '<div style="font-size:14px;line-height:1.8;margin-bottom:12px;">' + escapeHtml(data.answer).replace(/\n/g, '<br>') + '</div>';
+      }
+
+      if (data.sources && data.sources.length) {
+        html += '<div style="font-size:12px;color:var(--text-secondary);">';
+        html += '📄 来源: ' + data.sources.join(', ');
+        html += ' | 片段数: ' + data.segmentCount;
+        html += ' | 耗时: ' + data.elapsedMs + 'ms';
+        html += '</div>';
+      }
+
+      output.innerHTML = html || '<span class="error">未返回结果</span>';
+
+      // Show detail
+      if (data.answer) {
+        let dhtml = '<pre style="font-size:13px;line-height:1.6;margin:0;overflow-x:auto;">';
+        dhtml += JSON.stringify(data, null, 2);
+        dhtml += '</pre>';
+        detail.innerHTML = dhtml;
+      }
+    })
+    .catch(err => {
+      btn.disabled = false;
+      output.innerHTML = '<span class="error">⚠️ 请求异常: ' + escapeHtml(err.message) + '</span>';
+    });
+}
+
+// === 标签切换 ===
+function switchAgentTab(tab) {
+  document.querySelectorAll('#agentTabBar .tab-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  document.querySelectorAll('#tab-execute, #tab-rag').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+// === 工具函数 ===
+function removePlaceholder(el) {
+  if (el.dataset.placeholder && el.innerHTML === '') {
+    el.innerHTML = '';
+  }
+}
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+function truncate(text, max) {
+  if (!text) return '';
+  return text.length > max ? text.substring(0, max) + '...' : text;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: financial-agent
+  threads:
+    virtual:
+      enabled: true
+  jackson:
+    default-property-inclusion: non_null
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+
+# =============================================
+# DeepSeek LLM Configuration (OpenAI Compatible)
+# =============================================
+deepseek:
+  api-key: your-deepseek-api-key-here
+  base-url: https://api.deepseek.com/v1
+  chat-model: deepseek-chat
+  temperature: 0.7
+  max-tokens: 4096
+
+# =============================================
+# DashScope 百炼 Embedding Configuration
+# =============================================
+tongyi:
+  api-key: your-dashscope-api-key-here
+  base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
+  embedding-model: text-embedding-v3
+
+# =============================================
+# Elasticsearch Configuration
+# =============================================
+elasticsearch:
+  hosts: http://localhost:9200
+  username:
+  password:
+  index:
+    chunks: finance_chunks
+    docs: fin_rag_docs
+
+# =============================================
+# Rate Limiter Configuration
+# =============================================
+rate-limiter:
+  max-concurrent: 16
+
+# =============================================
+# RAG Configuration
+# =============================================
+rag:
+  chunk-size: 500
+  chunk-overlap: 50
+  max-segments: 5
+  min-score: 0.6
+
+# =============================================
+# Agent Configuration
+# =============================================
+agent:
+  max-retries: 3
+  check-point-dir: ./data/checkpoints
+
+# =============================================
+# Logging
+# =============================================
+logging:
+  level:
+    com.aiagent: DEBUG
+    org.springframework: INFO
+    co.elastic: WARN
