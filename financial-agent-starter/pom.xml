@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.aiagent</groupId>
+        <artifactId>financial-agent</artifactId>
+        <version>1.0.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>financial-agent-starter</artifactId>
+    <name>Financial Agent Starter</name>
+    <description>启动装配模块：启动类、配置、文档资源、演示脚本</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.aiagent</groupId>
+            <artifactId>financial-agent-interfaces</artifactId>
+        </dependency>
+        <!-- 显式依赖 infrastructure，确保其 Bean 参与组件扫描 -->
+        <dependency>
+            <groupId>com.aiagent</groupId>
+            <artifactId>financial-agent-infrastructure</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                    <jvmArguments>
+                        -XX:+UseZGC
+                        -XX:MaxGCPauseMillis=10
+                        -Dreactor.schedulers.defaultBoundedElasticOnVirtualThreads=true
+                        -Dspring.classformat.ignore=true
+                    </jvmArguments>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
