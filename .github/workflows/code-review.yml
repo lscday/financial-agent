@@ -1,0 +1,24 @@
+name: LLM Code Review
+
+# 每次 push 到 main 或 PR 时触发大模型代码审查
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  llm-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2   # 拉取上一个提交，用于计算本次 diff
+
+      - name: Run LLM Code Review
+        run: bash script/llm_review.sh
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          BASE_SHA: ${{ github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+          REF_NAME: ${{ github.ref_name }}
