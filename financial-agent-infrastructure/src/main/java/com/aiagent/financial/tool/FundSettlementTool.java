@@ -1,4 +1,7 @@
 package com.aiagent.financial.tool;
+import com.aiagent.financial.domain.model.settlement.Settlement;
+import com.aiagent.financial.domain.model.settlement.SettlementId;
+import com.aiagent.financial.domain.repository.SettlementRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -6,29 +9,39 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 资金清算工具函数。
  * 模拟对接外部资金清算接口，支持大模型自主调取完成智能测算。
+ *
+ * <p>清算记录通过 {@link SettlementRepository}（领域仓储接口）持久化，
+ * 当前由内存实现保存，后续可替换为真实清算系统 + 数据库。</p>
  */
-
 @Component
 public class FundSettlementTool {
 
     private static final Logger log = LoggerFactory.getLogger(FundSettlementTool.class);
 
     private final AtomicLong settlementIdCounter = new AtomicLong(0);
-    private final Map<String, SettlementRecord> records = new ConcurrentHashMap<>();
+
+    private final SettlementRepository settlementRepository;
+
+    /**
+     * 构造资金清算工具。
+     *
+     * @param settlementRepository 清算仓储（领域接口）
+     */
+    public FundSettlementTool(SettlementRepository settlementRepository) {
+        this.settlementRepository = settlementRepository;
+    }
 
     /**
      * 执行资金清算模拟。
      *
-     * @param query 原始查询
+     * @param query        原始查询
      * @param businessData 产品查询返回的数据
-     * @param riskInfo 风险评估结果
+     * @param riskInfo     风险评估结果
      * @return 格式化后的清算结果
      */
     public String settle(String query, String businessData, String riskInfo) {
@@ -37,6 +50,8 @@ public class FundSettlementTool {
 
         log.info("处理清算：{} | 业务数据长度：{}", settlementId,
                 businessData != null ? businessData.length() : 0);
+
+        Settlement settlement = new Settlement(new SettlementId(settlementId), query, businessData, riskInfo);
 
         // 模拟清算逻辑
         boolean hasError = query != null && (
@@ -48,7 +63,8 @@ public class FundSettlementTool {
 
         if (hasError && !query.contains("force_ok")) {
             String errorMsg = "清算执行失败：资金账户余额不足（错误代码: ERR_INSUFFICIENT_FUNDS）";
-            records.put(settlementId, new SettlementRecord(settlementId, "FAILED", errorMsg, LocalDateTime.now()));
+            settlement.fail(errorMsg);
+            settlementRepository.save(settlement);
             log.warn("清算 {} 失败：{}", settlementId, errorMsg);
             return errorMsg;
         }
@@ -63,22 +79,10 @@ public class FundSettlementTool {
                 处理结果：资金已划付，待确认
                 """.formatted(settlementId, LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
-        records.put(settlementId, new SettlementRecord(settlementId, "COMPLETED", result, LocalDateTime.now()));
+        settlement.complete(result);
+        settlementRepository.save(settlement);
         log.info("清算 {} 成功完成", settlementId);
         return result;
     }
 
-    /**
-     * 根据 ID 查询清算记录。
-     */
-    public String querySettlement(String settlementId) {
-        SettlementRecord record = records.get(settlementId);
-        if (record == null) {
-            return "未找到清算记录: " + settlementId;
-        }
-        return "清算记录: ID=%s, 状态=%s, 时间=%s".formatted(
-                record.id(), record.status(), record.timestamp());
-    }
-
-    public record SettlementRecord(String id, String status, String detail, LocalDateTime timestamp) {}
 }

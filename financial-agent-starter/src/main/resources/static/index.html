@@ -6,62 +6,75 @@
 <title>金融资管 AI 智能中台</title>
 <style>
   :root {
-    --primary: #1a73e8;
-    --primary-dark: #1557b0;
-    --bg: #f0f2f5;
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --primary-light: #eef2ff;
+    --bg: #f5f6fa;
+    --bg-deep: #eef0f6;
     --card: #ffffff;
-    --text: #1f1f1f;
-    --text-secondary: #666;
-    --border: #e0e0e0;
-    --success: #0f9d58;
-    --warning: #f4b400;
-    --danger: #d93025;
-    --radius: 12px;
-    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+    --text: #1a1d2b;
+    --text-secondary: #6b7280;
+    --border: #e5e7eb;
+    --success: #10b981;
+    --success-bg: #ecfdf5;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --danger-bg: #fef2f2;
+    --radius: 14px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.06);
+    --shadow-hover: 0 4px 8px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.12);
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", sans-serif;
-    background: var(--bg);
+    background: linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
+    background-attachment: fixed;
     color: var(--text);
     min-height: 100vh;
   }
 
   /* Header */
   .header {
-    background: linear-gradient(135deg, #1a73e8, #0d47a1);
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
     color: #fff;
-    padding: 20px 32px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    padding: 28px 40px;
+    box-shadow: 0 4px 20px rgba(79,70,229,0.25);
   }
-  .header h1 { font-size: 22px; font-weight: 600; }
-  .header p { font-size: 13px; opacity: 0.85; margin-top: 4px; }
+  .header h1 { font-size: 24px; font-weight: 700; letter-spacing: 0.5px; }
+  .header p { font-size: 13px; opacity: 0.85; margin-top: 6px; }
 
   /* Layout */
-  .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .container { max-width: 1280px; margin: 0 auto; padding: 28px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 
   /* Cards */
   .card {
     background: var(--card);
     border-radius: var(--radius);
+    border: 1px solid var(--border);
     box-shadow: var(--shadow);
     overflow: hidden;
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+  }
+  .card:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
   }
   .card-header {
-    padding: 14px 20px;
+    padding: 16px 22px;
     font-size: 15px;
     font-weight: 600;
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+    background: linear-gradient(180deg, #fafbff 0%, #ffffff 100%);
   }
-  .card-body { padding: 16px 20px; }
+  .card-body { padding: 18px 22px; }
   .card-footer {
-    padding: 12px 20px;
+    padding: 12px 22px;
     border-top: 1px solid var(--border);
-    background: #fafafa;
+    background: #fafbfc;
     font-size: 12px;
     color: var(--text-secondary);
   }
@@ -70,46 +83,53 @@
   .full-width { grid-column: 1 / -1; }
 
   /* Form */
-  .input-row { display: flex; gap: 10px; margin-bottom: 12px; }
+  .input-row { display: flex; gap: 10px; margin-bottom: 14px; }
   .input-row:last-child { margin-bottom: 0; }
   input, select {
     flex: 1;
     padding: 10px 14px;
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 14px;
     outline: none;
-    transition: border 0.2s;
+    background: #fff;
+    transition: border 0.2s, box-shadow 0.2s;
   }
-  input:focus, select:focus { border-color: var(--primary); }
+  input:focus, select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+  }
 
   /* Buttons */
   .btn {
     padding: 10px 20px;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
     white-space: nowrap;
     display: inline-flex; align-items: center; gap: 6px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
   }
+  .btn:hover { transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
   .btn-primary { background: var(--primary); color: #fff; }
-  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-primary:hover { background: var(--primary-dark); box-shadow: 0 4px 12px rgba(99,102,241,0.35); }
   .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
   .btn-success { background: var(--success); color: #fff; }
-  .btn-success:hover { background: #0b8043; }
+  .btn-success:hover { background: #0da271; box-shadow: 0 4px 12px rgba(16,185,129,0.35); }
   .btn-danger { background: var(--danger); color: #fff; }
-  .btn-danger:hover { background: #b3261e; }
+  .btn-danger:hover { background: #dc2626; box-shadow: 0 4px 12px rgba(239,68,68,0.35); }
   .btn-sm { padding: 6px 12px; font-size: 12px; }
 
   /* Output */
   .output {
-    background: #f8f9fa;
+    background: #fafbfd;
     border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px;
+    border-radius: 10px;
+    padding: 16px;
     font-size: 14px;
     line-height: 1.7;
     min-height: 180px;
@@ -121,7 +141,7 @@
   }
   .output:empty::before {
     content: attr(data-placeholder);
-    color: #aaa;
+    color: #b0b7c3;
   }
   .output .streaming { color: var(--primary); }
   .output .token {
@@ -140,15 +160,16 @@
   .agent-summary { margin-bottom: 12px; }
   .agent-badge {
     display: inline-block;
-    padding: 3px 10px;
-    border-radius: 12px;
+    padding: 3px 12px;
+    border-radius: 999px;
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 600;
     margin-right: 6px;
+    margin-bottom: 4px;
   }
-  .badge-success { background: #e6f4ea; color: var(--success); }
-  .badge-fail { background: #fce8e6; color: var(--danger); }
-  .badge-info { background: #e8f0fe; color: var(--primary); }
+  .badge-success { background: var(--success-bg); color: #047857; }
+  .badge-fail { background: var(--danger-bg); color: #b91c1c; }
+  .badge-info { background: var(--primary-light); color: var(--primary-dark); }
 
   /* Loading */
   .spinner {
@@ -164,15 +185,16 @@
   /* Status bar */
   .status-bar {
     display: flex; gap: 20px; flex-wrap: wrap;
-    padding: 12px 0 4px;
+    padding: 14px 0 2px;
     font-size: 14px;
-    color: #e0e8ff;
+    color: rgba(255,255,255,0.9);
     font-weight: 500;
   }
-  .status-item { display: flex; align-items: center; gap: 6px; }
+  .status-item { display: flex; align-items: center; gap: 8px; }
   .status-dot {
     width: 8px; height: 8px; border-radius: 50%;
     display: inline-block;
+    box-shadow: 0 0 6px rgba(255,255,255,0.4);
   }
   .dot-online { background: var(--success); }
   .dot-offline { background: var(--danger); }
@@ -180,32 +202,33 @@
   /* Responsive */
   @media (max-width: 900px) {
     .grid { grid-template-columns: 1fr; }
-    .container { padding: 12px; }
-    .header { padding: 16px; }
+    .container { padding: 16px; }
+    .header { padding: 20px; }
   }
 
   /* Tabs within cards */
   .tab-bar {
-    display: flex; gap: 4px;
-    margin-bottom: 12px;
+    display: flex; gap: 6px;
+    margin-bottom: 16px;
     border-bottom: 1px solid var(--border);
     padding-bottom: 8px;
   }
   .tab-btn {
-    padding: 6px 16px;
+    padding: 7px 18px;
     border: none;
     background: none;
     font-size: 13px;
+    font-weight: 500;
     cursor: pointer;
-    border-radius: 6px;
+    border-radius: 8px;
     color: var(--text-secondary);
     transition: all 0.2s;
   }
   .tab-btn.active {
-    background: var(--primary);
-    color: #fff;
+    background: var(--primary-light);
+    color: var(--primary-dark);
   }
-  .tab-btn:hover:not(.active) { background: #f0f0f0; }
+  .tab-btn:hover:not(.active) { background: #f3f4f6; color: var(--text); }
   .tab-content { display: none; }
   .tab-content.active { display: block; }
 </style>
@@ -251,6 +274,7 @@
         <div class="tab-bar" id="agentTabBar">
           <button class="tab-btn active" onclick="switchAgentTab('execute')">执行工作流</button>
           <button class="tab-btn" onclick="switchAgentTab('rag')">RAG 检索</button>
+          <button class="tab-btn" onclick="switchAgentTab('settlement')">清算状态</button>
         </div>
 
         <!-- Tab: Execute -->
@@ -284,6 +308,15 @@
             <button class="btn btn-success" id="ragBtn" onclick="executeRAG()">🔍 RAG 检索</button>
           </div>
           <div class="output" id="ragOutput" data-placeholder="RAG 检索结果将显示在这里..."></div>
+        </div>
+
+        <!-- Tab: Settlement Status -->
+        <div class="tab-content" id="tab-settlement">
+          <div class="input-row">
+            <input type="text" id="settlementId" placeholder="输入清算编号（如 STL2026080600002）...">
+            <button class="btn btn-success" id="settlementBtn" onclick="querySettlementStatus()">🔎 查询状态</button>
+          </div>
+          <div class="output" id="settlementOutput" data-placeholder="清算状态将显示在这里..."></div>
         </div>
       </div>
       <div class="card-footer">
@@ -440,6 +473,13 @@ function renderAgentResult(data, output, detail) {
 
   output.innerHTML = html;
 
+  // 如果执行结果是清算流程，提取清算编号并自动查询状态
+  const m = (data.summary || '').match(/STL\d+/);
+  if (m) {
+    document.getElementById('settlementId').value = m[0];
+    querySettlementStatus(m[0]);
+  }
+
   // Detail：展示完整返回
   let dhtml = '<pre style="font-size:13px;line-height:1.6;margin:0;overflow-x:auto;">';
   dhtml += JSON.stringify(data, null, 2);
@@ -497,8 +537,46 @@ function executeRAG() {
 function switchAgentTab(tab) {
   document.querySelectorAll('#agentTabBar .tab-btn').forEach(b => b.classList.remove('active'));
   event.target.classList.add('active');
-  document.querySelectorAll('#tab-execute, #tab-rag').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('#tab-execute, #tab-rag, #tab-settlement').forEach(el => el.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
+}
+
+// === 清算状态查询 ===
+function querySettlementStatus(id) {
+  const settlementId = id || document.getElementById('settlementId').value.trim();
+  const output = document.getElementById('settlementOutput');
+  if (!settlementId) {
+    output.innerHTML = '<span class="error">⚠️ 请输入清算编号</span>';
+    return;
+  }
+
+  output.innerHTML = '<span class="streaming"><span class="spinner"></span> 查询中...</span>';
+
+  fetch(BASE + '/api/agent/settlement/' + encodeURIComponent(settlementId))
+    .then(r => {
+      if (r.status === 404) throw new Error('未找到该清算记录');
+      if (!r.ok) throw new Error('HTTP ' + r.status + ': ' + r.statusText);
+      return r.json();
+    })
+    .then(data => {
+      let html = '<div style="margin-bottom:8px;"><strong>✅ 清算状态</strong></div>';
+      html += '<div style="font-size:13px;line-height:1.8;">';
+      html += '📋 清算编号: ' + escapeHtml(data.settlementId) + '<br>';
+      html += '🔖 状态: ';
+      if (data.status === '已成功') {
+        html += '<span class="agent-badge badge-success">' + escapeHtml(data.status) + '</span>';
+      } else if (data.status === '已失败') {
+        html += '<span class="agent-badge badge-fail">' + escapeHtml(data.status) + '</span>';
+      } else {
+        html += '<span class="agent-badge badge-info">' + escapeHtml(data.status) + '</span>';
+      }
+      html += '<br>🕐 创建时间: ' + escapeHtml(data.createdAt);
+      html += '</div>';
+      output.innerHTML = html;
+    })
+    .catch(err => {
+      output.innerHTML = '<span class="error">⚠️ ' + escapeHtml(err.message) + '</span>';
+    });
 }
 
 // === 文件上传/下载 ===
