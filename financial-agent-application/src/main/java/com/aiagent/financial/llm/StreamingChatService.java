@@ -38,7 +38,7 @@ public class StreamingChatService {
 
     private static final String RAG_CONFIRM_PROMPT = """
             判断以下参考文档片段是否足以回答用户问题。
-            只需回复"够"或"不够"。
+            只能回复两个汉字之一："够" 或 "不够"，不要回复其他任何内容。
 
             用户问题：%s
 
@@ -107,9 +107,11 @@ public class StreamingChatService {
         // 中间档：先非流式让 LLM 确认片段是否足以回答
         String confirmPrompt = String.format(RAG_CONFIRM_PROMPT, question, result.contextText());
         String confirm = chatModel.chat(confirmPrompt);
-        boolean enough = confirm != null && (confirm.contains("够") || confirm.contains("可以"));
+        // 精确判断：取首个非空白词，严格等于"够"才算足够，避免 "可以/不可以" 这类误判
+        boolean enough = confirm != null && confirm.trim().startsWith("够");
 
-        log.info("中间档 LLM 确认: 片段是否足以回答={}", enough);
+        log.info("中间档 LLM 确认: 片段是否足以回答={} (原始回复={})", enough,
+                confirm != null ? confirm.trim().substring(0, Math.min(20, confirm.trim().length())) : "null");
         if (enough) {
             streamRagAnswer(question, result.contextText(), sink);
         } else {
