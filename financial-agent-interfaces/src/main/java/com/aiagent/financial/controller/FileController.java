@@ -46,7 +46,7 @@ public class FileController {
      */
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public FileUploadCommand.Response upload(@RequestParam("file") MultipartFile file) {
-        var request = new FileUploadCommand.Request(file.getOriginalFilename());
+        FileUploadCommand.Request request = new FileUploadCommand.Request(file.getOriginalFilename());
         try (InputStream in = file.getInputStream()) {
             return fileStorageAppService.upload(request, in);
         } catch (Exception e) {

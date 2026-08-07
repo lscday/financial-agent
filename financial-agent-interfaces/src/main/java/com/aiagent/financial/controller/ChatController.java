@@ -35,7 +35,7 @@ public class ChatController {
      * 浏览器 EventSource 仅支持 GET，故保留查询参数。
      *
      * @param question       用户问题
-     * @param conversationId 会话标识
+     * @param conversationId 会话标识（多轮对话时区分会话，可选）
      * @return 文本事件流
      */
     @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)

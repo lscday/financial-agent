@@ -44,7 +44,7 @@ public class AgentController {
      */
     @PostMapping("/execute")
     public ExecuteAgentCommand.Response execute(@RequestBody ExecuteAgentCommand.Request request) {
-        var result = orchestrator.execute(request.query(), request.businessType());
+        FinancialAgentOrchestrator.AgentExecutionResult result = orchestrator.execute(request.query(), request.businessType());
         return ExecuteAgentCommand.Response.from(result);
     }
 

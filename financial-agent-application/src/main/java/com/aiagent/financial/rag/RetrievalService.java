@@ -2,6 +2,7 @@ package com.aiagent.financial.rag;
 
 import com.aiagent.financial.domain.model.rag.VectorMatch;
 import com.aiagent.financial.domain.repository.EmbeddedVectorRepository;
+import dev.langchain4j.data.embedding.Embedding;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -40,13 +41,13 @@ public class RetrievalService {
      */
     public RetrievalResult retrieve(String query) {
         // 1. 对查询进行向量化
-        var queryEmbedding = embeddingService.embedText(query);
+        Embedding queryEmbedding = embeddingService.embedText(query);
 
         // 2. 搜索向量存储
-        var matches = vectorRepository.findSimilar(queryEmbedding.vector(), maxSegments, minScore);
+        List<VectorMatch> matches = vectorRepository.findSimilar(queryEmbedding.vector(), maxSegments, minScore);
 
         // 3. 拼接上下文文本
-        var contextBuilder = new StringBuilder();
+        StringBuilder contextBuilder = new StringBuilder();
         for (int i = 0; i < matches.size(); i++) {
             VectorMatch match = matches.get(i);
             contextBuilder.append("【参考文档 ").append(i + 1).append("】")

@@ -38,7 +38,7 @@ public class RAGService {
     public RAGResponse query(String question) {
         long startTime = System.currentTimeMillis();
 
-        var retrievalResult = retrievalService.retrieve(question);
+        RetrievalService.RetrievalResult retrievalResult = retrievalService.retrieve(question);
         log.debug("查询 \"{}\" 检索到 {} 个片段", question, retrievalResult.matches().size());
 
         String prompt = String.format(SYSTEM_PROMPT, retrievalResult.contextText())

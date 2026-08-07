@@ -6,6 +6,7 @@ import com.aiagent.financial.rag.DocumentSplitter;
 import com.aiagent.financial.rag.EmbeddingService;
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.Metadata;
+import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.segment.TextSegment;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
@@ -44,18 +45,18 @@ public class DataInitializer {
     public void initialize() {
         try {
             // 扫描文档文件，计算每个文件的哈希
-            var fileHashes = computeFileHashes();
+            Map<String, String> fileHashes = computeFileHashes();
             if (fileHashes.isEmpty()) {
                 log.warn("未找到金融文档可导入");
                 return;
             }
 
             // 读取向量存储中上次记录的各文件哈希
-            var storedHashes = vectorRepository.getAllDocHashes();
+            Map<String, String> storedHashes = vectorRepository.getAllDocHashes();
 
             // 找出新增或变更的文件
             List<String> changedFiles = new ArrayList<>();
-            for (var entry : fileHashes.entrySet()) {
+            for (Map.Entry<String, String> entry : fileHashes.entrySet()) {
                 String filename = entry.getKey();
                 String currentHash = entry.getValue();
                 String storedHash = storedHashes.get(filename);
@@ -79,7 +80,7 @@ public class DataInitializer {
             log.info("=== 开始导入金融文档 ===");
 
             // 加载所有文档（用于后续分块）
-            var resolver = new PathMatchingResourcePatternResolver();
+            PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
             int totalSegments = 0;
 
             for (String filename : changedFiles) {
@@ -97,7 +98,7 @@ public class DataInitializer {
                 log.info("  文件 {} 分割为 {} 个片段", filename, segments.size());
 
                 // 向量化
-                var embeddings = embeddingService.embedAll(segments);
+                List<Embedding> embeddings = embeddingService.embedAll(segments);
                 log.info("  文件 {} 生成 {} 个向量嵌入", filename, embeddings.size());
 
                 // 转领域类型后存储
@@ -127,7 +128,7 @@ public class DataInitializer {
     private Map<String, String> computeFileHashes() {
         try {
             Map<String, String> result = new LinkedHashMap<>();
-            var resolver = new PathMatchingResourcePatternResolver();
+            PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
             Resource[] resources = resolver.getResources("classpath:documents/finance/**/*.{md,txt}");
 
             for (Resource resource : resources) {

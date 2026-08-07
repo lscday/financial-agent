@@ -56,7 +56,7 @@ public class SettlementDemoRunner implements CommandLineRunner {
     private void demoNormalSettlement() {
         log.info("\n--- 场景1：正常资金清算 ---");
         try {
-            var result = orchestrator.execute("理财产品A到期清算 force_ok", "wealth");
+            FinancialAgentOrchestrator.AgentExecutionResult result = orchestrator.execute("理财产品A到期清算 force_ok", "wealth");
             log.info("清算结果: success={}, history={}", result.success(), result.history());
             log.info("分析报告: {}", result.summary());
         } catch (Exception e) {
@@ -67,7 +67,7 @@ public class SettlementDemoRunner implements CommandLineRunner {
     private void demoRiskSettlement() {
         log.info("\n--- 场景2：高风险交易处理 ---");
         try {
-            var result = orchestrator.execute("大额资金转出500万", "wealth");
+            FinancialAgentOrchestrator.AgentExecutionResult result = orchestrator.execute("大额资金转出500万", "wealth");
             log.info("风控结果: success={}, riskLevel={}, history={}",
                     result.success(),
                     result.finalState() != null ? result.finalState().getRiskLevel() : "N/A",
@@ -80,7 +80,7 @@ public class SettlementDemoRunner implements CommandLineRunner {
     private void demoRAGQuery() {
         log.info("\n--- 场景3：RAG增强检索问答 ---");
         try {
-            var result = ragService.query("个人养老金每年缴费上限是多少？有哪些税收优惠？");
+            RAGService.RAGResponse result = ragService.query("个人养老金每年缴费上限是多少？有哪些税收优惠？");
             log.info("问题: {}", result.question());
             log.info("回答: {}", result.answer());
             log.info("参考来源: {}", result.sources());

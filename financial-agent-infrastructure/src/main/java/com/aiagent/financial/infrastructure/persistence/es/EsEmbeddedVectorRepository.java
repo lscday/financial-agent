@@ -6,17 +6,20 @@ import com.aiagent.financial.domain.repository.EmbeddedVectorRepository;
 import com.aiagent.financial.config.ElasticsearchConfig;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.annotation.PostConstruct;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.elasticsearch.client.Request;
+import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -86,7 +89,7 @@ public class EsEmbeddedVectorRepository implements EmbeddedVectorRepository {
                         """;
                 Request createReq = new Request("PUT", "/" + indexName);
                 createReq.setEntity(new StringEntity(mapping, ContentType.APPLICATION_JSON));
-                var response = restClient.performRequest(createReq);
+                Response response = restClient.performRequest(createReq);
                 log.info("索引 {} 已创建：{}", indexName, response.getStatusLine());
             } else {
                 log.info("索引 {} 已存在", indexName);
@@ -102,12 +105,12 @@ public class EsEmbeddedVectorRepository implements EmbeddedVectorRepository {
             return;
         }
         try {
-            var indexName = esConfig.getIndex().getChunks();
+            String indexName = esConfig.getIndex().getChunks();
             StringBuilder bulkBody = new StringBuilder();
             for (VectorEntry entry : entries) {
                 bulkBody.append("{\"index\":{\"_index\":\"").append(indexName).append("\"}}\n");
                 ObjectNode doc = objectMapper.createObjectNode();
-                var embArray = doc.putArray("embedding");
+                ArrayNode embArray = doc.putArray("embedding");
                 for (float value : entry.embedding()) {
                     embArray.add(value);
                 }
@@ -118,7 +121,7 @@ public class EsEmbeddedVectorRepository implements EmbeddedVectorRepository {
             }
             Request bulkRequest = new Request("POST", "/_bulk");
             bulkRequest.setEntity(new StringEntity(bulkBody.toString(), ContentType.APPLICATION_JSON));
-            var response = restClient.performRequest(bulkRequest);
+            Response response = restClient.performRequest(bulkRequest);
             JsonNode bulkResult = objectMapper.readTree(response.getEntity().getContent());
             if (bulkResult.has("errors") && bulkResult.get("errors").asBoolean()) {
                 log.warn("批量写入向量失败，部分文档未成功");
@@ -134,10 +137,10 @@ public class EsEmbeddedVectorRepository implements EmbeddedVectorRepository {
     @Override
     public List<VectorMatch> findSimilar(float[] queryVector, int topK, double minScore) {
         try {
-            var indexName = esConfig.getIndex().getChunks();
+            String indexName = esConfig.getIndex().getChunks();
             ObjectNode knnNode = objectMapper.createObjectNode();
             knnNode.put("field", "embedding");
-            var queryVecArray = knnNode.putArray("query_vector");
+            ArrayNode queryVecArray = knnNode.putArray("query_vector");
             for (float value : queryVector) {
                 queryVecArray.add(value);
             }
@@ -151,15 +154,15 @@ public class EsEmbeddedVectorRepository implements EmbeddedVectorRepository {
 
             Request searchRequest = new Request("POST", "/" + indexName + "/_search");
             searchRequest.setEntity(new StringEntity(queryBody.toString(), ContentType.APPLICATION_JSON));
-            var response = restClient.performRequest(searchRequest);
+            Response response = restClient.performRequest(searchRequest);
 
             JsonNode result = objectMapper.readTree(response.getEntity().getContent());
-            var hits = result.get("hits").get("hits");
+            JsonNode hits = result.get("hits").get("hits");
 
             List<VectorMatch> matches = new ArrayList<>();
             if (hits != null && hits.isArray()) {
-                for (var hit : hits) {
-                    var source = hit.get("_source");
+                for (JsonNode hit : hits) {
+                    JsonNode source = hit.get("_source");
                     if (source == null) {
                         continue;
                     }
@@ -183,7 +186,7 @@ public class EsEmbeddedVectorRepository implements EmbeddedVectorRepository {
         try {
             ObjectNode doc = objectMapper.createObjectNode();
             ObjectNode hashNode = doc.putObject("file_hashes");
-            for (var entry : hashes.entrySet()) {
+            for (Map.Entry<String, String> entry : hashes.entrySet()) {
                 hashNode.put(entry.getKey(), entry.getValue());
             }
             doc.put("updated_at", java.time.Instant.now().toString());
@@ -199,16 +202,16 @@ public class EsEmbeddedVectorRepository implements EmbeddedVectorRepository {
     public Map<String, String> getAllDocHashes() {
         try {
             Request req = new Request("GET", "/" + esConfig.getIndex().getChunks() + "/_doc/doc_hashes");
-            var response = restClient.performRequest(req);
+            Response response = restClient.performRequest(req);
             JsonNode result = objectMapper.readTree(response.getEntity().getContent());
             JsonNode hashes = result.get("_source").get("file_hashes");
             if (hashes == null) {
                 return Map.of();
             }
             java.util.Map<String, String> map = new java.util.LinkedHashMap<>();
-            var fields = hashes.fields();
+            Iterator<Map.Entry<String, JsonNode>> fields = hashes.fields();
             while (fields.hasNext()) {
-                var entry = fields.next();
+                Map.Entry<String, JsonNode> entry = fields.next();
                 map.put(entry.getKey(), entry.getValue().asText());
             }
             return map;
@@ -221,7 +224,7 @@ public class EsEmbeddedVectorRepository implements EmbeddedVectorRepository {
     public long count() {
         try {
             Request countReq = new Request("GET", "/" + esConfig.getIndex().getChunks() + "/_count");
-            var response = restClient.performRequest(countReq);
+            Response response = restClient.performRequest(countReq);
             JsonNode result = objectMapper.readTree(response.getEntity().getContent());
             return result.get("count").asLong();
         } catch (Exception e) {

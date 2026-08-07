@@ -17,80 +17,80 @@ public class AgentState extends org.bsc.langgraph4j.state.AgentState {
 
     // --- 输入 ---
     public String getQuery() {
-        var v = data().get("query");
+        Object v = data().get("query");
         return v instanceof String s ? s : "";
     }
 
     public String getBusinessType() {
-        var v = data().get("businessType");
+        Object v = data().get("businessType");
         return v instanceof String s ? s : "general";
     }
 
     // --- 规则检索 ---
     public String getRetrievedRules() {
-        var v = data().get("retrievedRules");
+        Object v = data().get("retrievedRules");
         return v instanceof String s ? s : "";
     }
 
     public int getRuleCount() {
-        var v = data().get("ruleCount");
+        Object v = data().get("ruleCount");
         return v instanceof Number n ? n.intValue() : 0;
     }
 
     // --- 风险检查 ---
     public String getRiskResult() {
-        var v = data().get("riskResult");
+        Object v = data().get("riskResult");
         return v instanceof String s ? s : "";
     }
 
     public boolean isHasRisk() {
-        var v = data().get("hasRisk");
+        Object v = data().get("hasRisk");
         return v instanceof Boolean b ? b : false;
     }
 
     public String getRiskLevel() {
-        var v = data().get("riskLevel");
+        Object v = data().get("riskLevel");
         return v instanceof String s ? s : "LOW";
     }
 
     // --- 数据查询 ---
     public String getQueryResult() {
-        var v = data().get("queryResult");
+        Object v = data().get("queryResult");
         return v instanceof String s ? s : "";
     }
 
     // --- 清算 ---
     public String getSettlementResult() {
-        var v = data().get("settlementResult");
+        Object v = data().get("settlementResult");
         return v instanceof String s ? s : "";
     }
 
     public boolean isSettlementSuccess() {
-        var v = data().get("settlementSuccess");
+        Object v = data().get("settlementSuccess");
         return v instanceof Boolean b ? b : false;
     }
 
     // --- 循环控制 ---
     public int getRetryCount() {
-        var v = data().get("retryCount");
+        Object v = data().get("retryCount");
         return v instanceof Number n ? n.intValue() : 0;
     }
 
     public String getLastError() {
-        var v = data().get("lastError");
+        Object v = data().get("lastError");
         return v instanceof String s ? s : "";
     }
 
     // --- 分析 ---
     public String getAnalysisResult() {
-        var v = data().get("analysisResult");
+        Object v = data().get("analysisResult");
         return v instanceof String s ? s : "";
     }
 
     // --- 历史 ---
     @SuppressWarnings("unchecked")
     public List<String> getHistory() {
-        var v = data().get("history");
+        Object v = data().get("history");
         if (v instanceof List<?> list) {
             return (List<String>) list;
         }

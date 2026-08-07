@@ -7,6 +7,7 @@ import com.aiagent.financial.agent.state.AgentState;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * 编排多 Agent 工作流。
@@ -35,7 +36,7 @@ public class FinancialAgentOrchestrator {
 
         try {
             // 使用初始状态运行编译后的图
-            var result = agentGraph.getCompiledGraph()
+            Optional<AgentState> result = agentGraph.getCompiledGraph()
                     .invoke(Map.of("query", query, "businessType", businessType != null ? businessType : "general"));
 
             long elapsed = System.currentTimeMillis() - startTime;

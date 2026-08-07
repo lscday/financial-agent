@@ -50,11 +50,11 @@ public class FinancialAgentGraph {
                                SettlementPolicy settlementPolicy,
                                @Value("${agent.max-retries:3}") int maxRetries) {
         try {
-            var ruleRetrievalNode = new RuleRetrievalNode(retrievalService);
-            var riskCheckNode = new RiskCheckNode(riskAssessmentTool);
-            var dataQueryNode = new DataQueryNode(productQueryTool);
-            var settlementNode = new SettlementNode(fundSettlementTool, settlementPolicy);
-            var analysisNode = new AnalysisNode(chatModel);
+            RuleRetrievalNode ruleRetrievalNode = new RuleRetrievalNode(retrievalService);
+            RiskCheckNode riskCheckNode = new RiskCheckNode(riskAssessmentTool);
+            DataQueryNode dataQueryNode = new DataQueryNode(productQueryTool);
+            SettlementNode settlementNode = new SettlementNode(fundSettlementTool, settlementPolicy);
+            AnalysisNode analysisNode = new AnalysisNode(chatModel);
 
             StateGraph<AgentState> graph = new StateGraph<>(AgentState::new);
 

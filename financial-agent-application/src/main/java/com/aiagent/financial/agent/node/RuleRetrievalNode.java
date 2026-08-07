@@ -28,7 +28,7 @@ public class RuleRetrievalNode implements NodeAction<AgentState> {
         log.info("=== RuleRetrievalNode 处理查询: {}", state.getQuery());
 
         try {
-            var result = retrievalService.retrieve(state.getQuery());
+            RetrievalService.RetrievalResult result = retrievalService.retrieve(state.getQuery());
             List<String> history = new ArrayList<>(state.getHistory());
             history.add("RuleRetrieval");
 
